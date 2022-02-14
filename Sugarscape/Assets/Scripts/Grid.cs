@@ -18,6 +18,8 @@ public class Grid : MonoBehaviour
 
     int gridSizeX; //Nos dice el numero de cuadros que caben en el eje X
     int gridSizeY; //Nos dice el número de cuadros que caben en el eje Z. 
+    Texture2D gridTexture;
+    SpriteRenderer rend;
     
     private void Awake()
     {
@@ -26,9 +28,14 @@ public class Grid : MonoBehaviour
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / cellSize);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / cellSize);
         gridCenter = transform.position;
+        rend = GetComponent<SpriteRenderer>();
 
         CreateGrid();
         InitiateResources();
+    }
+
+    void Start(){
+        UpdateSprite();
     }
 
     public int MaxSize
@@ -121,6 +128,34 @@ public class Grid : MonoBehaviour
         int y = Mathf.FloorToInt(gridSizeY * percentY);
 
         return grid[x, y];
+    }
+
+    //Método para crear una textura
+    Texture2D CreateTexture(Texture2D tex){
+        foreach (Cell c in grid){
+            Color color = SugarCellColor(c.sugarLevel / maxResources);
+            tex.SetPixel(c.gridX, c.gridY, color);
+        }
+        tex.Apply();
+        tex.filterMode = FilterMode.Point;
+        return tex;
+
+    }
+
+    public void UpdateSprite(){
+        gridTexture = new Texture2D(gridSizeX, gridSizeY);
+        gridTexture = CreateTexture(gridTexture);
+        Sprite gridSprite = Sprite.Create(gridTexture, new Rect(0f,0f,gridTexture.width,gridTexture.height), new Vector2(0.5f, 0.5f),50f);
+        rend.sprite = gridSprite;
+    }
+
+    // Función para calcular el color de las celdas basado en la capacidad de azúcar.
+    Color SugarCellColor(float x){
+        Vector3 colorMax = new Vector3(1, 0.8f, 0);
+        Vector3 colorMin = new Vector3(1, 1, 1);
+        Vector3 newColor = x * colorMax + (1-x) * colorMin;
+
+        return(new Color(newColor.x, newColor.y, newColor.z, 1f));
     }
 
 
