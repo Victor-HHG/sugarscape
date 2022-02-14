@@ -11,14 +11,14 @@ public class Grid : MonoBehaviour
     public GameObject peak1Reference;
     public GameObject peak2Reference;
     public float resourceRadius;
-    
+    public int maxResources;
+
     Vector2 gridCenter; //Se introducen los valores en el editor.
     Cell[,] grid;
 
     int gridSizeX; //Nos dice el numero de cuadros que caben en el eje X
     int gridSizeY; //Nos dice el número de cuadros que caben en el eje Z. 
-    int maxResources;
-
+    
     private void Awake()
     {
         //Se calcula el número de cuadros que caben en el grid dividiendo lo que mide el grid entre el tamaño de las celdas (o lado del cuadrito).
@@ -26,8 +26,6 @@ public class Grid : MonoBehaviour
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / cellSize);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / cellSize);
         gridCenter = transform.position;
-
-        maxResources = Mathf.CeilToInt(Mathf.Min(gridSizeX, gridSizeY)/resourceRadius);
 
         CreateGrid();
         InitiateResources();
@@ -62,18 +60,25 @@ public class Grid : MonoBehaviour
                 grid[x, y] = new Cell(worldPoint, x, y, 1, 1);
             }
         }
-    }
+    } 
 
     // Este método inicializa la asignación de recursos en el grid. Sólo se ejecuta al principio.
     void InitiateResources(){
+        // Se obtienen las posiciones de los dos peak
         Vector2 peak1Position = peak1Reference.transform.position;
         Vector2 peak2Position = peak2Reference.transform.position;
         
         foreach(Cell c in grid){
+            //Se calcula la distancia de cada celda al peak más cercano
             float distanceToPeak1 = Vector2.Distance(peak1Position, c.worldPosition);
             float distanceToPeak2 = Vector2.Distance(peak2Position, c.worldPosition);
             float distanceNearest = Mathf.Min(distanceToPeak1, distanceToPeak2);
+            // Se generan discos basados en la distancia, dividiéndola por el radio del círculo deseado.
+            // Se resta dicho valor redondeado al máximo de azúcar permitido.
             int sugarCap = maxResources - Mathf.FloorToInt(distanceNearest / resourceRadius);
+            // Se asegura que no haya capacidades negativas
+            sugarCap = Mathf.Max(0, sugarCap);
+            //Se asigna la capacidad y nivel a la celda en cuestión.
             c.sugarCapacity = sugarCap;
             c.sugarLevel = sugarCap;
         }
@@ -84,17 +89,16 @@ public class Grid : MonoBehaviour
     //Este método dibuja líneas guía para que sólo se ven durante el desarrollo. Al parecer eso son los Gizmos.
     private void OnDrawGizmos()
     {
-        //Se dibuja un cuadro que permite calibrar el tamaño del plano que representa el piso.
-        //Una vez dibujado el gizmo, se cambian las medidas del gridWorldSize en el editor de Unity.
         Gizmos.DrawWireCube(gridCenter, gridWorldSize);
 
              //Se dibujan cuadritos representando cada nodo del grid.
+             // Sólo se dibuja si el grid existe y la opción displayGridGizmos está activa
             if (grid != null && displayGridGizmos)
             {
                 foreach (Cell c in grid)
                 {
                     //Se determina el color del cuadro
-                    Gizmos.color = new Color(1,0,0,c.sugarLevel / maxResources);
+                    Gizmos.color = new Color(0,1,0,c.sugarLevel / maxResources);
                     //Se dibuja el cuadro en la posición de cada cuadtrito, con cada lado igual a 1 menos un pequeño espacio entre cubos.
                     Gizmos.DrawCube(c.worldPosition, Vector2.one * (cellSize - 0.1f));
                 }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cell : MonoBehaviour
+public class Cell
 {
     public Vector3 worldPosition; //Posición en las coordenadas del mundo
 
@@ -14,12 +14,12 @@ public class Cell : MonoBehaviour
     public float sugarCapacity;
     public float sugarLevel;
 
-    public Cell(Vector2 _worldPosition, int _gridX, int _gridY, float _sugarCapacity, float _sugarLevel)
-{
-    worldPosition = _worldPosition;
-    gridX = _gridX;
-    gridY = _gridY;
-    sugarCapacity = _sugarCapacity;
-    sugarLevel = _sugarLevel;
-}
+    public Cell(Vector2 _worldPosition, int _gridX, int _gridY, int _sugarCapacity, int _sugarLevel)
+    {
+        worldPosition = _worldPosition;
+        gridX = _gridX;
+        gridY = _gridY;
+        sugarCapacity = _sugarCapacity;
+        sugarLevel = _sugarLevel;
+    }
 }
