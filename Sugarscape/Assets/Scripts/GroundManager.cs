@@ -17,21 +17,30 @@ public class GroundManager : MonoBehaviour
     public TileBase[] sugarTiles;
 
     Vector2 gridCenter; 
-    Cell[,] grid;
+    public Cell[,] grid;
 
-    int gridSizeX; //Nos dice el numero de cuadros que caben en el eje X
-    int gridSizeY; //Nos dice el número de cuadros que caben en el eje Z. 
+    public int gridSizeX; //Nos dice el numero de cuadros que caben en el eje X
+    public int gridSizeY; //Nos dice el número de cuadros que caben en el eje Z. 
     int maxSize;
+    
+    //bordes del mapa
+    public float xBorderNeg, xBorderPos, yBorderNeg, yBorderPos;
         
     private void Awake()
     {
-        //Se calcula el número de cuadros que caben en el grid dividiendo lo que mide el grid entre el tamaño de las celdas (o lado del cuadrito).
-        //Se redondea el resultado a números enteros.
+        // Se calcula el número de cuadros que caben en el grid, dividiendo
+        // lo que mide el grid entre el tamaño de las celdas (o lado del cuadrito).
+        // Se redondea el resultado a números enteros.
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / cellSize);
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / cellSize);
         maxSize = gridSizeX * gridSizeY;
 
         gridCenter = transform.position;
+
+        xBorderNeg = gridCenter.x - gridWorldSize.x/2;
+        xBorderPos = gridCenter.x + gridWorldSize.x/2;
+        yBorderNeg = gridCenter.y - gridWorldSize.y/2;
+        yBorderPos = gridCenter.y + gridWorldSize.y/2;
 
         CreateGrid();
         InitiateResources();
@@ -101,9 +110,8 @@ public class GroundManager : MonoBehaviour
             tileArray[counter] = sugarTiles[0];
             counter += 1;
         }
-
-        tilescape.SetTiles(positionArray, tileArray);
         
+        tilescape.SetTiles(positionArray, tileArray);
     }
 
     private void UpdateTiles(){
